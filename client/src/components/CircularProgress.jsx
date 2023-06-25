@@ -7,7 +7,7 @@ const CircularProgress = ({ progress, title }) => {
 
   const circleStyle = {
     fill: "red",
-    stroke: "lightgray",
+    stroke: "#3fbfe9",
     strokeWidth: 4,
   };
 

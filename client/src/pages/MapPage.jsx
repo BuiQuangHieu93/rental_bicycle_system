@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Heading, Footer, CircularProgress } from "../components";
 import axios from "axios";
 import { useGlobalContext } from "../contextProvider";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import Map, {
-  NavigationControl,
-  GeolocateControl,
-  FullscreenControl,
-  Marker,
-  Popup,
-  useControl,
-} from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { SearchBox } from "@mapbox/search-js-react";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
+import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
+import mapboxgl from "mapbox-gl/dist/mapbox-gl";
+import { renderToString } from "react-dom/server"; // Import the minified version
 
 import {
   subscriptions,
@@ -23,13 +17,11 @@ import {
   subscriptions_index,
   subscription_ticket_index,
 } from "../constants/index";
-
-import { Progress } from "rsuite";
-import "rsuite/dist/rsuite.min.css";
+import { closeBlack } from "../assets";
 
 const MapPage = () => {
   const [selected, setSelected] = useState(null);
-  const [station, setStation] = useState();
+  const [station, setStation] = useState([]);
   const [bike, setBike] = useState();
   const [open, setOpen] = useState(false);
   const { formRentBike, setFormRentBike } = useGlobalContext();
@@ -46,11 +38,7 @@ const MapPage = () => {
     lat: 10.8813279,
     lng: 106.8060503,
   };
-  const [searchViewState, setSearchViewState] = useState({
-    latitude: center.lat,
-    longitude: center.lng,
-    zoom: 14,
-  });
+
   const handleClick = (marker) => {
     const newMarker = marker;
     console.log("Station", newMarker);
@@ -83,6 +71,7 @@ const MapPage = () => {
   const handleRent = async (e) => {
     console.log(e);
     if (e?.bike_status) {
+      console.log("I'm here");
       const updatedFormRentBike = {
         station_id: e.bike_station,
         bike_id: e._id,
@@ -180,23 +169,68 @@ const MapPage = () => {
     });
   }, []);
 
-  const handleRetrieve = (res) => {
-    console.log(
-      res.features[0].geometry.coordinates[0],
-      res.features[0].geometry.coordinates[1]
-    );
-
-    setSearchViewState({
-      ...searchViewState,
-      longitude: res.features[0].geometry.coordinates[0],
-      latitude: res.features[0].geometry.coordinates[1],
-      zoom: 14,
-    });
-  };
-
   const findNumberBike = (stationId) => {
     return bikeList.filter((bike) => bike.bike_station === stationId).length;
   };
+
+  const mapContainerRef = useRef(null);
+  const directionsContainerRef = useRef(null);
+
+  useEffect(() => {
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoiaGlldWJ1aTIxMTEiLCJhIjoiY2xoYnNyZTZhMDhzcDNlazFtN29sYWE2cSJ9.qoIL5LR1bQqLYKHwhN9gLA";
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [center.lng, center.lat],
+      zoom: 15,
+    });
+
+    const directions = new MapboxDirections({
+      accessToken: mapboxgl.accessToken,
+      unit: "metric",
+      profile: "mapbox/cycling",
+      container: directionsContainerRef.current,
+      congestion: true,
+      language: "en",
+      zoom: 15,
+    });
+
+    map.addControl(directions, "top-left");
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.GeolocateControl());
+    map.addControl(new mapboxgl.FullscreenControl());
+
+    station.forEach((station) => {
+      const markerElement = document.createElement("div");
+      console.log(findNumberBike(station._id), station.station_park);
+      const progress = findNumberBike(station._id) / station.station_park;
+      const title = findNumberBike(station._id);
+
+      const CircularProgressComponent = (
+        <CircularProgress key={station._id} progress={progress} title={title} />
+      );
+
+      markerElement.innerHTML = renderToString(CircularProgressComponent);
+
+      markerElement.addEventListener("click", () => {
+        handleClick(station);
+      });
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+        `<h3>${station.station_name}</h3>`
+      );
+
+      new mapboxgl.Marker(markerElement)
+        .setLngLat([station.station_lng, station.station_lat])
+        .addTo(map);
+    });
+
+    return () => {
+      map.remove();
+    };
+  }, [station]);
 
   return (
     <div className="relative">
@@ -206,84 +240,14 @@ const MapPage = () => {
       </div>
       <div className="relative sm:mt-[120px]">
         <div className="flex w-full justify-center">
-          <Map
-            {...searchViewState}
-            style={{ width: "100%", height: "500px" }}
-            mapStyle="mapbox://styles/mapbox/streets-v12"
-            mapboxAccessToken="pk.eyJ1IjoiaGlldWJ1aTIxMTEiLCJhIjoiY2xoYnNyZTZhMDhzcDNlazFtN29sYWE2cSJ9.qoIL5LR1bQqLYKHwhN9gLA"
-            transitionDuration="200"
-            onMove={(evt) => setSearchViewState(evt.viewState)}
-          >
-            <NavigationControl />
-            <GeolocateControl />
-            <FullscreenControl position="bottom-right" />
-
-            {station?.map((station) => (
-              <React.Fragment key={station?._id}>
-                <Marker
-                  longitude={station.station_lng}
-                  latitude={station.station_lat}
-                >
-                  <button onClick={() => handleClick(station)}>
-                    <div>
-                      <CircularProgress
-                        progress={
-                          findNumberBike(station._id) / station.station_park
-                        }
-                        title={findNumberBike(station._id)}
-                      />
-                    </div>
-                  </button>
-                </Marker>
-                {open && selected && selected._id === station._id && (
-                  <Popup
-                    latitude={selected.station_lat}
-                    longitude={selected.station_lng}
-                    anchor="bottom"
-                    closeButton={true}
-                    closeOnClick={false}
-                    onClose={() => {
-                      setOpen(false);
-                      setSelected(null);
-                    }}
-                    maxWidth="310px"
-                  >
-                    <div className="w-72 text-black">
-                      <h2 className="font-bold mb-4 text-lg text-center">
-                        {selected.station_name}
-                      </h2>
-                      {bike?.map((bike) => (
-                        <div
-                          className="flex items-center justify-between mb-2"
-                          key={bike?._id}
-                        >
-                          <div className="bg-gray-200 px-3 py-2 rounded-lg text-center">
-                            {bike?._id}
-                          </div>
-                          <div>
-                            <button
-                              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                              onClick={() => handleRent(bike)}
-                            >
-                              <p>Rent Bike</p>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="flex w-full justify-center">
-                        <button
-                          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                          onClick={handleReturnBike}
-                        >
-                          Return Bike
-                        </button>
-                      </div>
-                    </div>
-                  </Popup>
-                )}
-              </React.Fragment>
-            ))}
-          </Map>
+          <>
+            <div
+              ref={mapContainerRef}
+              style={{ width: "100%", height: "585px" }}
+              id="mapContainer"
+            />
+            <div ref={directionsContainerRef} />
+          </>
         </div>
         {openFee && (
           <div>
@@ -298,8 +262,8 @@ const MapPage = () => {
                   </div>
                   <div className="flex w-full justify-center">
                     <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                      onClick={(res) => handleClickPay(res)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                      onClick={handleClickPay}
                     >
                       Pay
                     </button>
@@ -309,22 +273,55 @@ const MapPage = () => {
             </div>
           </div>
         )}
-        <div className="absolute top-0 right-0 w-full flex justify-center items-center">
-          <div className="bg-white">
-            <SearchBox
-              accessToken="pk.eyJ1IjoiaGlldWJ1aTIxMTEiLCJhIjoiY2xoYnNyZTZhMDhzcDNlazFtN29sYWE2cSJ9.qoIL5LR1bQqLYKHwhN9gLA"
-              value={value}
-              onChange={(v) => {
-                setValue(v);
-                console.log("change", v);
-              }}
-              onSuggest={(res) => console.log("Suggest", res)}
-              onSuggestError={(res) => console.log("Suggest Error", res)}
-              onRetrieve={(res) => handleRetrieve(res)}
-            />
+      </div>
+      {open && (
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-slate-700 bg-opacity-70 flex items-center justify-center">
+          <div className="bg-white p-4 text-black">
+            <div className="flex w-full flex-row-reverse pb-4">
+              <button onClick={() => setOpen(false)}>
+                <img src={closeBlack} alt="close" />
+              </button>
+            </div>
+            <div>
+              <div className="font-bold text-lg">
+                Station: {selected?.station_name}
+              </div>
+              <div className="my-2">
+                Bikes Available: {findNumberBike(selected._id)}
+              </div>
+              <div className="my-2">
+                Parks Available:
+                {selected?.station_park - findNumberBike(selected._id)}
+              </div>
+
+              <div>
+                {bike?.map((bike) => (
+                  <div
+                    key={bike.bike_id}
+                    className="flex flex-row justify-between items-center pb-2"
+                  >
+                    <div>{bike.bike_code}</div>
+                    <button
+                      className="px-4 py-2 bg-blue-500 text-white rounded-md ml-4"
+                      onClick={() => handleRent(bike)}
+                    >
+                      Rent Bike
+                    </button>
+                  </div>
+                ))}
+                <div className="flex w-full justify-center">
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md ml-2"
+                    onClick={handleReturnBike}
+                  >
+                    Return Bike
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <Footer />
     </div>
   );
