@@ -84,11 +84,19 @@ const MapPage = () => {
         );
         console.log(response);
         setFormRentBike(updatedFormRentBike);
-        toast.success("Bike rented successfully");
+        toast.success("Bike rented successfully", {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "colored",
+        });
         setOpen(false);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to rent bike");
+        toast.error("Failed to rent bike", {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "colored",
+        });
       }
     } else {
       alert("Bike not available, please select another bike...!");
@@ -115,10 +123,18 @@ const MapPage = () => {
       setOpen(false);
 
       setOpenFee(true);
-      toast.success("Bike returned successfully!");
+      toast.success("Bike returned successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to return bike");
+      toast.error("Failed to return bike", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 

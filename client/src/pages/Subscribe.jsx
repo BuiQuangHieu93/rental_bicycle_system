@@ -64,10 +64,18 @@ const Subscribe = () => {
         .then((response) => {
           console.log(response?.data.user.account_type);
         });
-      toast.success("Register successfully!");
+      toast.success("Register successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     } catch (error) {
       console.log(error);
-      toast.error("Failed to register");
+      toast.error("Failed to register", {
+        position: "top-right",
+        autoClose: 3000,
+        theme: "colored",
+      });
     }
   };
 
