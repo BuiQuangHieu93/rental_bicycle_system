@@ -53,7 +53,7 @@ const Subscribe = () => {
       const subscriptionPlan =
         subscriptions.find((plan) => plan.type === title) ||
         subscriptions_single.find((plan) => plan.title === title);
-      const price = parseInt(subscriptionPlan.price.split(" ")[0]);
+      const price = parseInt(subscriptionPlan?.price.split(" ")[0]);
 
       axios
         .put("http://localhost:8080/api/v1/users/subscribe", {
@@ -63,15 +63,22 @@ const Subscribe = () => {
         })
         .then((response) => {
           console.log(response?.data.user.account_type);
+          toast.success("Register successfully!", {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "colored",
+          });
+        })
+        .catch(() => {
+          toast.error("Register failure!", {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "colored",
+          });
         });
-      toast.success("Register successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "colored",
-      });
     } catch (error) {
       console.log(error);
-      toast.error("Failed to register", {
+      toast.error("Register failure", {
         position: "top-right",
         autoClose: 3000,
         theme: "colored",
@@ -124,7 +131,6 @@ const Subscribe = () => {
                   ))}
                 </div>
                 <div className="p-4">
-                  {" "}
                   <CustomButton
                     title="Learn More"
                     restStyle="bg-green_theme"

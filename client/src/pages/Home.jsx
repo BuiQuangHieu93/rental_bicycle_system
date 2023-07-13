@@ -120,10 +120,10 @@ const Home = () => {
           </div>
           <div className="mt-2 text-black">Find a EcoCycleGo around you.</div>
           <a>
-            {" "}
             <CustomButton
               title="See docking points"
               restStyle="bg-green_theme"
+              handleClick={() => navigate("/map")}
             />
           </a>
         </div>

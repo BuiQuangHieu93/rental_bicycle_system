@@ -94,12 +94,12 @@ const login = async (req, res) => {
   try {
     const user = await Account.findOne({ account_name: username });
     if (!user) {
-      return res.status(404).send({ error: "Username not Found" });
+      return res.status(404).send({ error: "Username not Found!" });
     }
 
     const passwordCheck = await bcrypt.compare(password, user.account_password);
     if (!passwordCheck) {
-      return res.status(400).send({ error: "Password does not Match" });
+      return res.status(400).send({ error: "Password does not Match!" });
     }
 
     //create jwt token

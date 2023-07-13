@@ -165,7 +165,8 @@ const Account = () => {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                {user.account_role}
+                {user.account_role.charAt(0).toUpperCase() +
+                  user.account_role.slice(1)}
               </th>
               <th
                 scope="row"

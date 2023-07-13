@@ -4,6 +4,7 @@ import { peopleBlack, mail } from "../assets";
 import { styles } from "../styles";
 import CustomButton from "./CustomButton";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const Form = () => {
   const [formData, setFormData] = useState({
@@ -30,9 +31,19 @@ const Form = () => {
       .post("http://localhost:8080/api/v1/contacts/add", formData)
       .then((response) => {
         console.log(response);
+        toast.success("Send contact successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "colored",
+        });
       })
       .catch((error) => {
-        console.error(error);
+        console.log(error);
+        toast.error("Send contact failure!", {
+          position: "top-right",
+          autoClose: 3000,
+          theme: "colored",
+        });
       });
   };
 
@@ -90,7 +101,8 @@ const Form = () => {
   };
 
   return (
-    <div>
+    <div className="relative">
+      <ToastContainer />
       <div className={`bg-white flex flex-col ${styles.padding}`}>
         <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex flex-row lg:w-[45%] w-full pt-2 pb-2">

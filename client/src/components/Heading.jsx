@@ -31,8 +31,22 @@ const Heading = () => {
     localStorage.removeItem("username");
     setUsername(null);
     setUserRole(null);
+    localStorage.removeItem("account_id");
     setIsLoggedIn(false);
   };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setUsername(null);
+      setUserRole(null);
+      localStorage.removeItem("account_id");
+      setIsLoggedIn(false);
+    }, 60 * 60 * 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
 
   return (
     <div>
@@ -40,7 +54,7 @@ const Heading = () => {
         <div
           className={`w-full items-center justify-center bg-white fixed ${
             styles.paddingX
-          } ${isFixed ? "" : "pt-6 pb-6"}`}
+          } ${isFixed ? "" : "pt-2 pb-2"}`}
         >
           <div className={`w-full flex flex-row justify-between `}>
             <div
@@ -58,7 +72,7 @@ const Heading = () => {
                 href="/weather"
                 className="flex justify-center items-center w-full h-full text-black font-aria-narrow text-[22px]"
               >
-                Discover EcoCycleGo
+                Discover
               </a>
 
               <a
@@ -79,7 +93,7 @@ const Heading = () => {
                 href="/contact"
                 className="flex justify-center items-center w-full h-full text-black font-aria-narrow text-[22px]"
               >
-                Contact EcoCycleGo
+                Contact
               </a>
             </div>
             {username ? (
@@ -89,9 +103,13 @@ const Heading = () => {
               >
                 <a href="/login">
                   <div>
-                    <img src={people} alt="people" />
+                    <img
+                      src={people}
+                      alt="people"
+                      className="w-[47px] h-[47px] p-1"
+                    />
                   </div>
-                  <h4 className="font-medium pl-1 text-white">{username}</h4>
+                  <h4 className="font-medium text-white">{username}</h4>
                 </a>
               </button>
             ) : (
@@ -102,7 +120,7 @@ const Heading = () => {
                 <div>
                   <img src={people} alt="people" />
                 </div>
-                <h4 className="font-medium pl-1 text-white">Log in</h4>
+                <h4 className="font-medium text-white">Log in</h4>
               </a>
             )}
           </div>

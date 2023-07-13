@@ -36,6 +36,7 @@ import logoBlack from "./logo-black.png";
 import logoColor from "./logo-color.png";
 import download from "./download.jpg";
 import imageDiscover from "./imageDiscover.jpg";
+import bikeStation from "./bicycle-station.svg";
 export {
   bikeIcon,
   locationIcon,
@@ -75,4 +76,5 @@ export {
   logoColor,
   download,
   imageDiscover,
+  bikeStation,
 };

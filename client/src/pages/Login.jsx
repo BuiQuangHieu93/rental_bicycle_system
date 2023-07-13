@@ -5,6 +5,7 @@ import { facebook1, github, google } from "../assets";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useGlobalContext } from "../contextProvider";
+import { toast, ToastContainer } from "react-toastify";
 
 const Login = () => {
   const { setIsLoggedIn, setUserRole } = useGlobalContext();
@@ -13,6 +14,7 @@ const Login = () => {
     username: "",
     password: "",
   });
+  const [errorMsg, setErrorMsg] = useState("");
   useEffect(() => {}, [loginForm]);
 
   const handleLogin = (event) => {
@@ -33,8 +35,20 @@ const Login = () => {
             localStorage.removeItem("userRole");
           }, 60 * 60 * 1000); // 1 hour in milliseconds
         })
+        .then(() => {
+          toast.success("Login successfully", {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "colored",
+          });
+        })
         .catch((error) => {
-          console.log(error);
+          setErrorMsg(error?.response?.data?.error);
+          toast.error("Login failure!", {
+            position: "top-right",
+            autoClose: 3000,
+            theme: "colored",
+          });
         });
       setIsLoggedIn(true);
       console.log(typeof userRole);
@@ -45,6 +59,7 @@ const Login = () => {
 
   return (
     <div className="relative">
+      <ToastContainer />
       <div className="bg-home-pattern bg-cover bg-no-repeat bg-center w-full">
         <Heading />
       </div>
@@ -109,6 +124,7 @@ const Login = () => {
                   }
                 />
               </div>
+              {errorMsg && <div className="p-2 text-center">{errorMsg}</div>}
               <CustomButton
                 title="Login"
                 restStyle="bg-green_theme"

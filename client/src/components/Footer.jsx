@@ -21,13 +21,15 @@ const Footer = () => {
           </button>
         </div>
 
-        <div className={`flex flex-col items-center ${styles.padding}`}>
+        <div className={`flex flex-col items-center sm:${styles.padding}`}>
           <div className="font-semibold font-aria-narrow text-[48px] text-center">
             CONTACTS
           </div>
           <p className="text-[32px]">PRESS</p>
           <p className="pt-4 text-[18px]">Bui Quang Hieu</p>
-          <p className="pb-2 text-[20px]">ITITIU18286@studednt.hcmiu.edu.vn</p>
+          <p className="pb-2 sm:text-[20px] text-[15px]">
+            ITITIU18286@studednt.hcmiu.edu.vn
+          </p>
         </div>
 
         <div className={`flex flex-col items-center ${styles.padding}`}>
@@ -56,8 +58,12 @@ const Footer = () => {
       <div className="w-full bg-white h-1"></div>
 
       <div className={`flex flex-row ${styles.padding} w-full justify-around`}>
-        <img src={download} alt="illusApp" className="md:block hidden" />
-        <div className="flex flex-col items-center justify-center pr-8 pl-8">
+        <img
+          src={download}
+          alt="illusApp"
+          className="md:block hidden w-[80%]"
+        />
+        <div className="flex flex-col items-center justify-center pr-7 pl-7">
           <h1 className="font-semibold font-aria-narrow text-[52px] text-center">
             Download the EcoCycleGo app
           </h1>
@@ -100,7 +106,7 @@ const Footer = () => {
             </button>
           </div>
           <h3 className="pt-3 text-center">
-            © 2021 Smovengo / Syndicat Autolib' EcoCycleGo
+            © 2023 Smovengo / Syndicat Autolib' EcoCycleGo
           </h3>
         </div>
       </div>

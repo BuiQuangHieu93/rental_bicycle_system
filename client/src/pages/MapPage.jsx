@@ -71,7 +71,6 @@ const MapPage = () => {
   const handleRent = async (e) => {
     console.log(e);
     if (e?.bike_status) {
-      console.log("I'm here");
       const updatedFormRentBike = {
         station_id: e.bike_station,
         bike_id: e._id,
@@ -211,6 +210,7 @@ const MapPage = () => {
       congestion: true,
       language: "en",
       zoom: 15,
+      interactive: true,
     });
 
     map.addControl(directions, "top-left");
@@ -246,7 +246,7 @@ const MapPage = () => {
     return () => {
       map.remove();
     };
-  }, [station]);
+  }, [station, bike]);
 
   return (
     <div className="relative">
@@ -254,7 +254,7 @@ const MapPage = () => {
       <div className="bg-home-pattern bg-cover bg-no-repeat bg-center w-full pb-10">
         <Heading />
       </div>
-      <div className="relative sm:mt-[120px]">
+      <div className="relative lg:mt-[100px]">
         <div className="flex w-full justify-center">
           <>
             <div

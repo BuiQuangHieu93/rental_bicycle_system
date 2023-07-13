@@ -10,7 +10,7 @@ const WeatherPage = () => {
       <div className="bg-home-pattern bg-cover bg-no-repeat bg-center w-full">
         <Heading />
       </div>
-      <div className="bg-white w-full flex flex-col sm:mt-[180px]">
+      <div className="bg-white w-full flex flex-col lg:mt-[140px] pt-4">
         <div className="flex items-center justify-center">
           <button
             className="bg-blue_theme text-white px-8 py-4 rounded-l-full rounded-r-lg"
