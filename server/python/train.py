@@ -10,7 +10,7 @@ load_dotenv()
 mongodb_url = os.getenv("MONGODB_URL")
 client = pymongo.MongoClient(mongodb_url)
 db = client["test"]
-collection = db["data"]
+collection = db["dataTest"]
 data = pd.DataFrame(list(collection.find({}, {'_id': 0})))
 
 

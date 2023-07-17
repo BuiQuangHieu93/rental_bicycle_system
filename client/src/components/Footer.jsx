@@ -61,7 +61,7 @@ const Footer = () => {
         <img
           src={download}
           alt="illusApp"
-          className="md:block hidden w-[80%]"
+          className="md:block hidden w-[30%]"
         />
         <div className="flex flex-col items-center justify-center pr-7 pl-7">
           <h1 className="font-semibold font-aria-narrow text-[52px] text-center">

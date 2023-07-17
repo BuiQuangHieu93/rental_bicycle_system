@@ -52,7 +52,7 @@ const Contact = () => {
   };
   return (
     <div>
-      <div>Manager Contact</div>
+      <div>Manager Contacts</div>
 
       <table className="w-full text-sm text-left text-gray-500 mt-8">
         <thead className="text-xs text-gray-700 uppercase bg-gray-200">

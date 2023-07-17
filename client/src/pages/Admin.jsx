@@ -16,6 +16,7 @@ const Admin = () => {
   const [username, setUsername] = useState();
   const { userRole } = useGlobalContext();
   const navigate = useNavigate();
+  const { setIsLoggedIn, setUserRole } = useGlobalContext();
 
   useEffect(() => {
     const userRole = localStorage.getItem("userRole");

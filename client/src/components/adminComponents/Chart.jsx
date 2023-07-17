@@ -184,19 +184,90 @@ const LineChart = () => {
         .map((_, i) => chartRefs[i] || React.createRef())
     );
   }, [charts.length]);
+  const trendAnalysis = (data) => {
+    // Trend analysis
+    const trend = data.reduce((sum, value, index, array) => {
+      if (index === array.length - 1) return sum;
+      const diff = array[index + 1] - value;
+      return sum + diff;
+    }, 0);
+    console.log(
+      "Trend:",
+      trend > 0 ? "Increasing" : trend < 0 ? "Decreasing" : "No trend"
+    );
 
-  const handleExportPDF = async () => {
+    // Peak and trough analysis
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    console.log("Peak:", max);
+    console.log("Trough:", min);
+
+    return {
+      trend: trend > 0 ? "Increasing" : trend < 0 ? "Decreasing" : "No trend",
+      peak: max,
+      trough: min,
+    };
+  };
+
+  const volatilityAnalysis = (data) => {
+    // Volatility analysis
+    const volatility = data.reduce((sum, value, index, array) => {
+      if (index === array.length - 1) return sum;
+      const diff = Math.abs(array[index + 1] - value);
+      return sum + diff;
+    }, 0);
+    return volatility;
+  };
+
+  const correlationAnalysis = (data) => {
+    // Correlation analysis
+    const correlation = data.reduce((result, label, index) => {
+      if (index === data.length - 1) return result;
+      const diff1 = data[index + 1] - data[index];
+      const diff2 = data[index + 1] - data[index];
+      return result + diff1 * diff2;
+    }, 0);
+    return correlation > 0
+      ? "Positive"
+      : correlation < 0
+      ? "Negative"
+      : "No correlation";
+  };
+
+  const handleExportPDF = async (charts) => {
     const pdf = new jsPDF();
     let currentPosition = 10;
 
     for (let i = 0; i < chartRefs.length; i++) {
       const chartRef = chartRefs[i];
-      console.log(chartRef.current);
+      const chartData = charts[i].data.map((data) => data.value);
+
+      const trend = trendAnalysis(chartData);
+      const volatility = volatilityAnalysis(chartData);
+      const correlation = correlationAnalysis(chartData);
+
       if (chartRef.current && chartRef.current.canvas) {
         const canvas = await html2canvas(chartRef.current.canvas);
         const imgData = canvas.toDataURL("image/png");
 
         pdf.addImage(imgData, "PNG", 10, currentPosition, 190, 100);
+        pdf.text(10, currentPosition + 110, `Trend: ${trend.trend}`);
+        pdf.text(10, currentPosition + 120, `Peak: ${trend.peak.toFixed(0)}`);
+        pdf.text(
+          10,
+          currentPosition + 130,
+          `Trough: ${trend.trough.toFixed(0)}`
+        );
+        pdf.text(
+          10,
+          currentPosition + 140,
+          `Volatility: ${volatility.toFixed(2)}`
+        );
+        pdf.text(
+          10,
+          currentPosition + 150,
+          `Correlation Analysis: ${correlation}`
+        );
 
         // If this is not the last chart, add a new page for the next chart
         if (i < chartRefs.length - 1) {
